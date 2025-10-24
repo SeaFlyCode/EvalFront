@@ -74,11 +74,6 @@ const UserSchema = z.object({
   role: z.string().optional(),
 });
 
-function handleFetchErrors(response: Response) {
-  if (!response.ok) throw new Error(`API Error ${response.status}: ${response.statusText}`);
-  return response;
-}
-
 export async function fetchUsers(options?: { limit?: number; skip?: number; q?: string }): Promise<User[]> {
     const params = new URLSearchParams();
     if (options?.limit) params.set('limit', String(options.limit));
@@ -100,16 +95,37 @@ export async function fetchUsers(options?: { limit?: number; skip?: number; q?: 
 }
 
 export async function fetchUserById(id: number): Promise<User> {
-  const res = await fetch(`https://dummyjson.com/users/${id}`);
-  handleFetchErrors(res);
-  const json = await res.json();
+  try {
+    if (!id || id <= 0) {
+      throw new Error('ID utilisateur invalide');
+    }
 
-  const parsed = UserSchema.safeParse(json);
-  if (!parsed.success) throw new Error(`Invalid user response for id=${id}: ${parsed.error.message}`);
-  return parsed.data as User;
+    const res = await fetch(`https://dummyjson.com/users/${id}`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+
+    const json = await res.json();
+
+    const parsed = UserSchema.safeParse(json);
+    if (!parsed.success) {
+      throw new Error(`Format de données invalide pour l'utilisateur ${id}: ${parsed.error.message}`);
+    }
+
+    return parsed.data as User;
+  } catch (err) {
+    console.error('fetchUserById error:', err);
+    throw err instanceof Error ? err : new Error(String(err));
+  }
 }
 
 export function parseUser(raw: unknown): User {
-  return UserSchema.parse(raw) as User;
+  try {
+    return UserSchema.parse(raw) as User;
+  } catch (err) {
+    console.error('parseUser error:', err);
+    throw new Error('Impossible de parser les données utilisateur: ' + (err instanceof Error ? err.message : String(err)));
+  }
 }
 

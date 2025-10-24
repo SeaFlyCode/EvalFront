@@ -39,28 +39,38 @@ export default function UserList() {
 
     // Filtrer les utilisateurs en fonction de la recherche
     const filteredUsers = users?.filter((user) => {
-        const query = searchQuery.toLowerCase();
-        return (
-            user.firstName.toLowerCase().includes(query) ||
-            user.lastName.toLowerCase().includes(query) ||
-            user.email.toLowerCase().includes(query) ||
-            `${user.firstName} ${user.lastName}`.toLowerCase().includes(query)
-        );
+        try {
+            const query = searchQuery.toLowerCase();
+            return (
+                user.firstName?.toLowerCase().includes(query) ||
+                user.lastName?.toLowerCase().includes(query) ||
+                user.email?.toLowerCase().includes(query) ||
+                `${user.firstName} ${user.lastName}`.toLowerCase().includes(query)
+            );
+        } catch (err) {
+            console.error('Erreur lors du filtrage de l\'utilisateur:', user, err);
+            return false;
+        }
     });
 
     // Trier les utilisateurs filtrés
     const sortedUsers = filteredUsers ? [...filteredUsers].sort((a, b) => {
-        switch (sortOption) {
-            case 'name-asc':
-                return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
-            case 'name-desc':
-                return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`);
-            case 'age-asc':
-                return (a.age ?? 0) - (b.age ?? 0);
-            case 'age-desc':
-                return (b.age ?? 0) - (a.age ?? 0);
-            default:
-                return 0;
+        try {
+            switch (sortOption) {
+                case 'name-asc':
+                    return `${a.firstName ?? ''} ${a.lastName ?? ''}`.localeCompare(`${b.firstName ?? ''} ${b.lastName ?? ''}`);
+                case 'name-desc':
+                    return `${b.firstName ?? ''} ${b.lastName ?? ''}`.localeCompare(`${a.firstName ?? ''} ${a.lastName ?? ''}`);
+                case 'age-asc':
+                    return (a.age ?? 0) - (b.age ?? 0);
+                case 'age-desc':
+                    return (b.age ?? 0) - (a.age ?? 0);
+                default:
+                    return 0;
+            }
+        } catch (err) {
+            console.error('Erreur lors du tri:', err);
+            return 0;
         }
     }) : null;
 
@@ -69,11 +79,22 @@ export default function UserList() {
     const totalPages = Math.ceil(totalUsers / USERS_PER_PAGE);
     const startIndex = (currentPage - 1) * USERS_PER_PAGE;
     const endIndex = startIndex + USERS_PER_PAGE;
-    const paginatedUsers = sortedUsers?.slice(startIndex, endIndex) ?? null;
+    const paginatedUsers = (() => {
+        try {
+            return sortedUsers?.slice(startIndex, endIndex) ?? null;
+        } catch (err) {
+            console.error('Erreur lors de la pagination:', err);
+            return null;
+        }
+    })();
 
     // Réinitialiser la page à 1 quand la recherche ou le tri change
     useEffect(() => {
-        setCurrentPage(1);
+        try {
+            setCurrentPage(1);
+        } catch (err) {
+            console.error('Erreur lors de la réinitialisation de la page:', err);
+        }
     }, [searchQuery, sortOption]);
 
     if (loading) return <div className="loading">Loading...</div>;

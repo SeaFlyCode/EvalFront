@@ -12,22 +12,38 @@ export default function UserDetail() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setError('ID utilisateur manquant');
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
     setLoading(true);
-    fetchUserById(Number(id))
-      .then((u) => {
+    setError(null);
+
+    const fetchData = async () => {
+      try {
+        const userId = Number(id);
+        if (isNaN(userId) || userId <= 0) {
+          throw new Error('ID utilisateur invalide');
+        }
+
+        const userData = await fetchUserById(userId);
         if (!mounted) return;
-        setUser(u);
-      })
-      .catch((err) => {
+        setUser(userData);
+      } catch (err) {
         if (!mounted) return;
-        setError(err?.message ?? String(err));
-      })
-      .finally(() => {
+        console.error('Erreur lors du chargement de l\'utilisateur:', err);
+        setError(err instanceof Error ? err.message : 'Une erreur est survenue lors du chargement');
+      } finally {
         if (!mounted) return;
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
+
     return () => {
       mounted = false;
     };
