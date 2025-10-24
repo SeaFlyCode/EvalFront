@@ -35,7 +35,7 @@ export default function UserList() {
 
     return (
         <div className="user-list">
-            <h1 className="user-list__title">Users</h1>
+            <h1 className="user-list__title">Utilisateurs</h1>
             <div className="user-list__grid">
                 {users && users.length > 0 ? (
                     users.map((u) => <UserCard key={u.id} user={u} />)

@@ -1,23 +1,35 @@
-/* File: src/components/UserCard.css */
 .user-card {
     display: flex;
-    gap: 12px;
+    flex-direction: column;
     align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
+    padding: 16px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fafafa;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .user-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 8px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     object-fit: cover;
+    margin-bottom: 12px;
 }
 
-.user-info {}
+.user-info {
+    text-align: center;
+    width: 100%;
+}
 
 .user-name {
     font-weight: 700;
+    margin-bottom: 4px;
 }
 
 .user-name a {
@@ -25,6 +37,14 @@
     color: inherit;
 }
 
+.user-name a:hover {
+    color: #646cff;
+}
+
 .user-email {
     color: #555;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
