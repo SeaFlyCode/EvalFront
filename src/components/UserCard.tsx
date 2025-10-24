@@ -21,6 +21,9 @@ export default function UserCard({ user }: Props) {
                     {user.firstName} {user.lastName}
                 </div>
                 <div className="user-email">{user.email}</div>
+                {user.age && (
+                    <div className="user-age">{user.age} ans</div>
+                )}
             </div>
         </Link>
     );
