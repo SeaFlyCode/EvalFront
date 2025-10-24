@@ -8,7 +8,7 @@ interface Props {
 
 export default function UserCard({ user }: Props) {
     return (
-        <div className="user-card">
+        <Link to={`/user/${user.id}`} className="user-card">
             <img
                 className="user-avatar"
                 src={user.image ?? ''}
@@ -18,12 +18,10 @@ export default function UserCard({ user }: Props) {
             />
             <div className="user-info">
                 <div className="user-name">
-                    <Link to={`/user/${user.id}`}>
-                        {user.firstName} {user.lastName}
-                    </Link>
+                    {user.firstName} {user.lastName}
                 </div>
                 <div className="user-email">{user.email}</div>
             </div>
-        </div>
+        </Link>
     );
 }

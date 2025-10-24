@@ -7,6 +7,9 @@
     border-radius: 8px;
     background-color: #fafafa;
     transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
 .user-card:hover {
@@ -32,14 +35,6 @@
     margin-bottom: 4px;
 }
 
-.user-name a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.user-name a:hover {
-    color: #646cff;
-}
 
 .user-email {
     color: #555;
