@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchUserById } from '../api/dummy';
 import type { User } from '../type/user';
@@ -6,6 +6,7 @@ import '../styles/UserDetail.css';
 import { Mail, Calendar, Phone, MapPin, Briefcase, GraduationCap, Cpu, Hash, Heart, Ruler } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import LoadingSpinner from './LoadingSpinner';
+import ErrorMessage from './ErrorMessage';
 
 export default function UserDetail() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,8 @@ export default function UserDetail() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Fonction de chargement avec useCallback pour permettre la relance
+  const loadUser = useCallback(() => {
     if (!id) {
       setError('ID utilisateur manquant');
       setLoading(false);
@@ -23,6 +25,7 @@ export default function UserDetail() {
     let mounted = true;
     setLoading(true);
     setError(null);
+    setUser(null);
 
     const fetchData = async () => {
       const startTime = Date.now();
@@ -35,11 +38,9 @@ export default function UserDetail() {
 
         const userData = await fetchUserById(userId);
 
-        // Calculer le temps écoulé
         const elapsedTime = Date.now() - startTime;
         const remainingTime = Math.max(0, 1000 - elapsedTime);
 
-        // Attendre au moins 1 seconde au total
         setTimeout(() => {
           if (!mounted) return;
           setUser(userData);
@@ -47,7 +48,6 @@ export default function UserDetail() {
         }, remainingTime);
 
       } catch (err) {
-        // Calculer le temps écoulé même en cas d'erreur
         const elapsedTime = Date.now() - startTime;
         const remainingTime = Math.max(0, 1000 - elapsedTime);
 
@@ -66,29 +66,31 @@ export default function UserDetail() {
       mounted = false;
     };
   }, [id]);
+
+  useEffect(() => {
+    const cleanup = loadUser();
+    return cleanup;
+  }, [loadUser]);
   if (loading) return (
     <div className="user-detail">
       <ThemeToggle />
       <LoadingSpinner />
     </div>
   );
+
   if (error) return (
     <div className="user-detail">
       <ThemeToggle />
-      <div className="error">
-        <h2>❌ Erreur</h2>
-        <p>{error}</p>
-        <Link to="/" className="back-link">← Retour à la liste</Link>
-      </div>
+      <Link to="/" className="back-link">← Retour à la liste</Link>
+      <ErrorMessage message={error} onRetry={loadUser} />
     </div>
   );
+
   if (!user) return (
     <div className="user-detail">
       <ThemeToggle />
-      <div className="empty">
-        <p>Aucun utilisateur trouvé</p>
-        <Link to="/" className="back-link">← Retour à la liste</Link>
-      </div>
+      <Link to="/" className="back-link">← Retour à la liste</Link>
+      <ErrorMessage message="Aucun utilisateur trouvé" />
     </div>
   );
   if (!user) return <div className="empty">No user found</div>;
