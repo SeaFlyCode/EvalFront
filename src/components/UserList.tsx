@@ -8,6 +8,7 @@ export default function UserList() {
     const [users, setUsers] = useState<User[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     useEffect(() => {
         let mounted = true;
@@ -30,17 +31,55 @@ export default function UserList() {
         };
     }, []);
 
+    // Filtrer les utilisateurs en fonction de la recherche
+    const filteredUsers = users?.filter((user) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            user.firstName.toLowerCase().includes(query) ||
+            user.lastName.toLowerCase().includes(query) ||
+            user.email.toLowerCase().includes(query) ||
+            `${user.firstName} ${user.lastName}`.toLowerCase().includes(query)
+        );
+    });
+
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">Error: {error}</div>;
 
     return (
         <div className="user-list">
             <h1 className="user-list__title">Utilisateurs</h1>
+
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Rechercher un utilisateur (nom, prénom, email)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                />
+                {searchQuery && (
+                    <button
+                        onClick={() => setSearchQuery('')}
+                        className="search-clear"
+                    >
+                        ✕
+                    </button>
+                )}
+            </div>
+
+            {searchQuery && (
+                <div className="search-results-info">
+                    {filteredUsers?.length ?? 0} résultat(s) trouvé(s)
+                </div>
+            )}
+
             <div className="user-list__grid">
-                {users && users.length > 0 ? (
-                    users.map((u) => <UserCard key={u.id} user={u} />)
+                {filteredUsers && filteredUsers.length > 0 ? (
+                    filteredUsers.map((u) => <UserCard key={u.id} user={u} />)
                 ) : (
-                    <div className="empty">No users found</div>
+                    <div className="empty">
+                        {searchQuery ? 'Aucun utilisateur ne correspond à votre recherche' : 'No users found'}
+                    </div>
                 )}
             </div>
         </div>
