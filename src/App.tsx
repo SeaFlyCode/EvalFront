@@ -5,6 +5,7 @@ import UserDetail from './components/UserDetail'
 import { Component } from 'react'
 import type { ReactNode } from 'react'
 import { FavoritesProvider } from './context/FavoritesContext'
+import { ThemeProvider } from './context/ThemeContext'
 
 // Error Boundary pour capturer les erreurs React
 class ErrorBoundary extends Component<
@@ -61,14 +62,16 @@ class ErrorBoundary extends Component<
 function App() {
   return (
     <ErrorBoundary>
-      <FavoritesProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<UserList />} />
-            <Route path="/user/:id" element={<UserDetail />} />
-          </Routes>
-        </BrowserRouter>
-      </FavoritesProvider>
+      <ThemeProvider>
+        <FavoritesProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<UserList />} />
+              <Route path="/user/:id" element={<UserDetail />} />
+            </Routes>
+          </BrowserRouter>
+        </FavoritesProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   )
 }

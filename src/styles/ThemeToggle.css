@@ -1,0 +1,47 @@
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border-color: #6366f1;
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle svg {
+  color: #6366f1;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mode sombre - bouton */
+[data-theme='dark'] .theme-toggle {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .theme-toggle svg {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .theme-toggle:hover {
+  border-color: #fbbf24;
+}
+

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchUsers } from '../api/dummy';
 import type { User } from '../type/user';
 import UserCard from './UserCard';
+import ThemeToggle from './ThemeToggle';
 import '../styles/UserList.css';
 
 type SortOption = 'none' | 'name-asc' | 'name-desc' | 'age-asc' | 'age-desc';
@@ -102,6 +103,7 @@ export default function UserList() {
 
     return (
         <div className="user-list">
+            <ThemeToggle />
             <h1 className="user-list__title">Utilisateurs</h1>
 
             <div className="search-bar">

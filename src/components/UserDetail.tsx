@@ -4,6 +4,7 @@ import { fetchUserById } from '../api/dummy';
 import type { User } from '../type/user';
 import '../styles/UserDetail.css';
 import { Mail, Calendar, Phone, MapPin, Briefcase, GraduationCap, Cpu, Hash, Heart, Ruler } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function UserDetail() {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +56,7 @@ export default function UserDetail() {
 
   return (
     <div className="user-detail">
+      <ThemeToggle />
       <Link to="/" className="back-link">← Retour à la liste</Link>
 
       <div className="user-detail__header">
