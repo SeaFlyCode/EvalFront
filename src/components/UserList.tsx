@@ -6,12 +6,15 @@ import '../styles/UserList.css';
 
 type SortOption = 'none' | 'name-asc' | 'name-desc' | 'age-asc' | 'age-desc';
 
+const USERS_PER_PAGE = 10;
+
 export default function UserList() {
     const [users, setUsers] = useState<User[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [sortOption, setSortOption] = useState<SortOption>('none');
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
     useEffect(() => {
         let mounted = true;
@@ -61,6 +64,18 @@ export default function UserList() {
         }
     }) : null;
 
+    // Pagination
+    const totalUsers = sortedUsers?.length ?? 0;
+    const totalPages = Math.ceil(totalUsers / USERS_PER_PAGE);
+    const startIndex = (currentPage - 1) * USERS_PER_PAGE;
+    const endIndex = startIndex + USERS_PER_PAGE;
+    const paginatedUsers = sortedUsers?.slice(startIndex, endIndex) ?? null;
+
+    // Réinitialiser la page à 1 quand la recherche ou le tri change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, sortOption]);
+
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">Error: {error}</div>;
 
@@ -109,14 +124,41 @@ export default function UserList() {
             )}
 
             <div className="user-list__grid">
-                {sortedUsers && sortedUsers.length > 0 ? (
-                    sortedUsers.map((u) => <UserCard key={u.id} user={u} />)
+                {paginatedUsers && paginatedUsers.length > 0 ? (
+                    paginatedUsers.map((u) => <UserCard key={u.id} user={u} />)
                 ) : (
                     <div className="empty">
                         {searchQuery ? 'Aucun utilisateur ne correspond à votre recherche' : 'No users found'}
                     </div>
                 )}
             </div>
+
+            {totalPages > 1 && (
+                <div className="pagination">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="pagination-btn"
+                    >
+                        ← Précédent
+                    </button>
+
+                    <div className="pagination-info">
+                        Page {currentPage} sur {totalPages}
+                        <span className="pagination-count">
+                            ({startIndex + 1}-{Math.min(endIndex, totalUsers)} sur {totalUsers})
+                        </span>
+                    </div>
+
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="pagination-btn"
+                    >
+                        Suivant →
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
