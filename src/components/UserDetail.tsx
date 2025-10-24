@@ -5,6 +5,7 @@ import type { User } from '../type/user';
 import '../styles/UserDetail.css';
 import { Mail, Calendar, Phone, MapPin, Briefcase, GraduationCap, Cpu, Hash, Heart, Ruler } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function UserDetail() {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +25,8 @@ export default function UserDetail() {
     setError(null);
 
     const fetchData = async () => {
+      const startTime = Date.now();
+
       try {
         const userId = Number(id);
         if (isNaN(userId) || userId <= 0) {
@@ -31,15 +34,29 @@ export default function UserDetail() {
         }
 
         const userData = await fetchUserById(userId);
-        if (!mounted) return;
-        setUser(userData);
+
+        // Calculer le temps écoulé
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 1000 - elapsedTime);
+
+        // Attendre au moins 1 seconde au total
+        setTimeout(() => {
+          if (!mounted) return;
+          setUser(userData);
+          setLoading(false);
+        }, remainingTime);
+
       } catch (err) {
-        if (!mounted) return;
-        console.error('Erreur lors du chargement de l\'utilisateur:', err);
-        setError(err instanceof Error ? err.message : 'Une erreur est survenue lors du chargement');
-      } finally {
-        if (!mounted) return;
-        setLoading(false);
+        // Calculer le temps écoulé même en cas d'erreur
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 1000 - elapsedTime);
+
+        setTimeout(() => {
+          if (!mounted) return;
+          console.error('Erreur lors du chargement de l\'utilisateur:', err);
+          setError(err instanceof Error ? err.message : 'Une erreur est survenue lors du chargement');
+          setLoading(false);
+        }, remainingTime);
       }
     };
 
@@ -49,9 +66,31 @@ export default function UserDetail() {
       mounted = false;
     };
   }, [id]);
-
-  if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (loading) return (
+    <div className="user-detail">
+      <ThemeToggle />
+      <LoadingSpinner />
+    </div>
+  );
+  if (error) return (
+    <div className="user-detail">
+      <ThemeToggle />
+      <div className="error">
+        <h2>❌ Erreur</h2>
+        <p>{error}</p>
+        <Link to="/" className="back-link">← Retour à la liste</Link>
+      </div>
+    </div>
+  );
+  if (!user) return (
+    <div className="user-detail">
+      <ThemeToggle />
+      <div className="empty">
+        <p>Aucun utilisateur trouvé</p>
+        <Link to="/" className="back-link">← Retour à la liste</Link>
+      </div>
+    </div>
+  );
   if (!user) return <div className="empty">No user found</div>;
 
   return (

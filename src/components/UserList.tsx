@@ -3,6 +3,7 @@ import { fetchUsers } from '../api/dummy';
 import type { User } from '../type/user';
 import UserCard from './UserCard';
 import ThemeToggle from './ThemeToggle';
+import { SkeletonCardGrid } from './SkeletonCard';
 import '../styles/UserList.css';
 
 type SortOption = 'none' | 'name-asc' | 'name-desc' | 'age-asc' | 'age-desc';
@@ -20,19 +21,38 @@ export default function UserList() {
     useEffect(() => {
         let mounted = true;
         setLoading(true);
+
+        const startTime = Date.now();
+
         fetchUsers({ limit: 30 })
             .then((res) => {
                 if (!mounted) return;
-                setUsers(res);
+
+                // Calculer le temps écoulé
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 1000 - elapsedTime);
+
+                // Attendre au moins 1 seconde au total
+                setTimeout(() => {
+                    if (!mounted) return;
+                    setUsers(res);
+                    setLoading(false);
+                }, remainingTime);
             })
             .catch((err) => {
                 if (!mounted) return;
-                setError(err?.message ?? String(err));
-            })
-            .finally(() => {
-                if (!mounted) return;
-                setLoading(false);
+
+                // Calculer le temps écoulé même en cas d'erreur
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 1000 - elapsedTime);
+
+                setTimeout(() => {
+                    if (!mounted) return;
+                    setError(err?.message ?? String(err));
+                    setLoading(false);
+                }, remainingTime);
             });
+
         return () => {
             mounted = false;
         };
@@ -97,7 +117,15 @@ export default function UserList() {
             console.error('Erreur lors de la réinitialisation de la page:', err);
         }
     }, [searchQuery, sortOption]);
-
+    if (loading) return (
+        <div className="user-list">
+            <ThemeToggle />
+            <h1 className="user-list__title">Utilisateurs</h1>
+            <div className="user-list__grid">
+                <SkeletonCardGrid count={10} />
+            </div>
+        </div>
+    );
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">Error: {error}</div>;
 
