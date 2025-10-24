@@ -209,33 +209,6 @@ Gestion d'erreur à plusieurs niveaux :
 - Texte secondaire : `#e2e8f0`
 - Accent : `#6366f1`
 
-## 📱 Responsive Design
-
-### Breakpoints
-- **Mobile** : < 640px
-- **Tablette** : 640px - 1024px
-- **Desktop** : > 1024px
-
-### Adaptations
-- Grille responsive : 1 colonne (mobile) → 2 colonnes (tablette) → 3 colonnes (desktop)
-- Header empilé verticalement sur mobile
-- Boutons pleine largeur sur mobile
-- Pagination en colonne sur mobile
-
-## 🚀 Déploiement
-
-```bash
-# Build de production
-npm run build
-
-# Les fichiers de production sont dans le dossier dist/
-# Vous pouvez les déployer sur :
-# - Vercel
-# - Netlify
-# - GitHub Pages
-# - Votre serveur web
-```
-
 ## 📝 Scripts Disponibles
 
 - `npm run dev` - Démarre le serveur de développement
