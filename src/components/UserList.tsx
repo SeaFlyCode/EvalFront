@@ -4,11 +4,14 @@ import type { User } from '../type/user';
 import UserCard from './UserCard';
 import '../styles/UserList.css';
 
+type SortOption = 'none' | 'name-asc' | 'name-desc' | 'age-asc' | 'age-desc';
+
 export default function UserList() {
     const [users, setUsers] = useState<User[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [sortOption, setSortOption] = useState<SortOption>('none');
 
     useEffect(() => {
         let mounted = true;
@@ -42,6 +45,22 @@ export default function UserList() {
         );
     });
 
+    // Trier les utilisateurs filtrés
+    const sortedUsers = filteredUsers ? [...filteredUsers].sort((a, b) => {
+        switch (sortOption) {
+            case 'name-asc':
+                return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+            case 'name-desc':
+                return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`);
+            case 'age-asc':
+                return (a.age ?? 0) - (b.age ?? 0);
+            case 'age-desc':
+                return (b.age ?? 0) - (a.age ?? 0);
+            default:
+                return 0;
+        }
+    }) : null;
+
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">Error: {error}</div>;
 
@@ -67,15 +86,31 @@ export default function UserList() {
                 )}
             </div>
 
+            <div className="sort-bar">
+                <label htmlFor="sort-select">Trier par :</label>
+                <select
+                    id="sort-select"
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value as SortOption)}
+                    className="sort-select"
+                >
+                    <option value="none">Aucun tri</option>
+                    <option value="name-asc">Nom (A → Z)</option>
+                    <option value="name-desc">Nom (Z → A)</option>
+                    <option value="age-asc">Âge (croissant)</option>
+                    <option value="age-desc">Âge (décroissant)</option>
+                </select>
+            </div>
+
             {searchQuery && (
                 <div className="search-results-info">
-                    {filteredUsers?.length ?? 0} résultat(s) trouvé(s)
+                    {sortedUsers?.length ?? 0} résultat(s) trouvé(s)
                 </div>
             )}
 
             <div className="user-list__grid">
-                {filteredUsers && filteredUsers.length > 0 ? (
-                    filteredUsers.map((u) => <UserCard key={u.id} user={u} />)
+                {sortedUsers && sortedUsers.length > 0 ? (
+                    sortedUsers.map((u) => <UserCard key={u.id} user={u} />)
                 ) : (
                     <div className="empty">
                         {searchQuery ? 'Aucun utilisateur ne correspond à votre recherche' : 'No users found'}
