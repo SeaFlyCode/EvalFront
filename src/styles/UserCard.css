@@ -1,0 +1,30 @@
+/* File: src/components/UserCard.css */
+.user-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.user-info {}
+
+.user-name {
+    font-weight: 700;
+}
+
+.user-name a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-email {
+    color: #555;
+}

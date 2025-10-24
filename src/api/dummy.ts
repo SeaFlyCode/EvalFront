@@ -1,6 +1,3 @@
-// Module d'accès à l'API https://dummyjson.com/users
-// Valide les réponses avec zod et expose des helpers typés.
-
 import { z } from 'zod';
 import type { User } from '../type/user';
 
@@ -77,31 +74,29 @@ const UserSchema = z.object({
   role: z.string().optional(),
 });
 
-const UsersListSchema = z.object({
-  users: z.array(UserSchema),
-  total: z.number().optional(),
-  skip: z.number().optional(),
-  limit: z.number().optional(),
-});
-
 function handleFetchErrors(response: Response) {
   if (!response.ok) throw new Error(`API Error ${response.status}: ${response.statusText}`);
   return response;
 }
 
 export async function fetchUsers(options?: { limit?: number; skip?: number; q?: string }): Promise<User[]> {
-  const url = new URL('https://dummyjson.com/users');
-  if (options?.limit != null) url.searchParams.set('limit', String(options.limit));
-  if (options?.skip != null) url.searchParams.set('skip', String(options.skip));
-  if (options?.q) url.searchParams.set('q', options.q);
+    const params = new URLSearchParams();
+    if (options?.limit) params.set('limit', String(options.limit));
+    if (options?.skip) params.set('skip', String(options.skip));
+    if (options?.q) params.set('q', options.q);
 
-  const res = await fetch(url.toString());
-  handleFetchErrors(res);
-  const json = await res.json();
+    const url = `https://dummyjson.com/users${params.toString() ? '?' + params.toString() : ''}`;
 
-  const parsed = UsersListSchema.safeParse(json);
-  if (!parsed.success) throw new Error(`Invalid users list response: ${parsed.error.message}`);
-  return parsed.data.users as User[];
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        const data = await res.json();
+        if (!data || !Array.isArray(data.users)) throw new Error('Format de réponse inattendu');
+        return data.users as User[];
+    } catch (err) {
+        console.error('fetchUsers error:', err);
+        throw err instanceof Error ? err : new Error(String(err));
+    }
 }
 
 export async function fetchUserById(id: number): Promise<User> {

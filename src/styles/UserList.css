@@ -1,0 +1,30 @@
+.user-list {
+    padding: 16px;
+    max-width: 960px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.user-list__title {
+    margin: 0 0 12px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.user-list__grid {
+    display: grid;
+    grid-auto-rows: min-content;
+    gap: 8px;
+}
+
+.loading,
+.empty {
+    color: #666666;
+    padding: 12px 0;
+}
+
+.error {
+    color: #d32f2f;
+    padding: 12px 0;
+    font-weight: 500;
+}
